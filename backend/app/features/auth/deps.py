@@ -1,29 +1,23 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from fastapi import Depends, Request
 from sqlalchemy.orm import Session
-
 from app.database import get_db
 from app.features.auth.repository import get_user_by_username
-from app.config import SECRET_KEY, ALGORITHM
+from app.utils.response import create_response
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+def get_current_user(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    token_payload = request.state.token_payload
+    if not token_payload:
+        return create_response(message="Unauthorized", status="failed", code=401)
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+    username = token_payload.get("sub")
+    if not username:
+        return create_response(message="Token missing username", status="failed", code=401)
 
-    user = get_user_by_username(db, username)  # 🆕
+    user = get_user_by_username(db, username)
     if not user:
-        raise credentials_exception
+        return create_response(message="User not found", status="failed", code=401)
+
     return user

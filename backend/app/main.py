@@ -1,36 +1,37 @@
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-import os
-import json
 
+from app.core.config import DUMMY_DATA_PATH
 from app.features.ai.routes import router as ai_router
 from app.features.user.routes import router as user_router
 from app.features.auth.routes import router as auth_router
 from app.database import Base, engine
+from app.database.seed import seed_initial_sysadmin
+from app.middleware.jwt_middleware import JWTMiddleware
 
-
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DUMMY_DATA_PATH = os.path.join(ROOT_DIR, "dummyData.json")
-ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(dotenv_path=ENV_PATH)
+import json
 
 with open(DUMMY_DATA_PATH, "r") as f:
     DUMMY_DATA = json.load(f)
 
 Base.metadata.create_all(bind=engine)
+seed_initial_sysadmin()
+
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Accept"],
 )
 
-@app.get("/api/v1/dummy-data", tags=["Dummy"])
+app.add_middleware(JWTMiddleware)
+
+
+@app.get("/api/sales-reps", tags=["Dummy"])
 def get_data():
     return DUMMY_DATA
 
@@ -44,6 +45,6 @@ def health():
         }
     )
 
-app.include_router(ai_router, prefix="/api/v1/ai", tags=["AI"])
+app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(user_router, prefix="/api/v1/users", tags=["Users"])

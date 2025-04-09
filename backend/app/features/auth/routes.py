@@ -1,25 +1,44 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
-from datetime import timedelta, datetime
 from jose import jwt
+from datetime import datetime, timedelta, timezone
+
 from app.database import get_db
-from app.features.user.models import User
-from app.features.auth.schemas import Token
+from app.features.auth.repository import get_user_by_username
 from app.utils.security import verify_password
-from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, BASIC_AUTH_TOKEN
+from app.features.auth.schemas import Token, LoginBody
 
 router = APIRouter()
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+def login(
+    login_data: LoginBody,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db),
+):
+    if not authorization.startswith("Basic "):
+        raise HTTPException(status_code=401, detail="Invalid auth scheme")
+
+    encoded_token = authorization.replace("Basic ", "")
+    if encoded_token != BASIC_AUTH_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    user = get_user_by_username(db, login_data.username)
+    if not user or not verify_password(login_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
     access_token = jwt.encode(
-        {"sub": user.username, "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)},
+        {
+            "sub": user.username,
+            "fullname": user.fullname,
+            "role": user.role,
+            "id": user.id,
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        },
         SECRET_KEY,
         algorithm=ALGORITHM,
     )
+
     return {"access_token": access_token, "token_type": "bearer"}
+

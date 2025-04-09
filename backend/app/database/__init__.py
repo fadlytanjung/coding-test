@@ -1,21 +1,22 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from app.core.config import DATABASE_URL, ROOT_DIR
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in the environment variables.")
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not SQLALCHEMY_DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set in the .env file")
+if DATABASE_URL.startswith("sqlite:///./"):
+    relative_path = DATABASE_URL.replace("sqlite:///./", "")
+    absolute_path = ROOT_DIR / relative_path
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{absolute_path}"
+else:
+    SQLALCHEMY_DATABASE_URL = DATABASE_URL
 
 connect_args = {"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
 
 def get_db():
