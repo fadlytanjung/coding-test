@@ -15,7 +15,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${env.NEXT_PUBLIC_BASE_API_URL}/data`);
+        const res = await fetch(`${env.NEXT_PUBLIC_BASE_API_URL}/sales-reps`);
         const data = await res.json();
         setUsers(data || []);
       } catch (error) {
