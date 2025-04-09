@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev --prefix frontend\" \"uvicorn backend.main:app --reload\""
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"cross-env PYTHONPATH=./backend uvicorn backend.app.main:app --reload\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "cross-env": "^7.0.3"
   },
   "keywords": [
     "AI",
