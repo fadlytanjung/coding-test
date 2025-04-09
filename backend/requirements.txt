@@ -3,3 +3,6 @@ uvicorn
 dotenv
 openai
 google-genai
+sqlalchemy
+passlib
+python-jose
