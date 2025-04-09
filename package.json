@@ -1,0 +1,20 @@
+{
+  "name": "coding-test",
+  "version": "1.0.0",
+  "description": "InterOpera Coding Test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"uvicorn backend.main:app --reload\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "AI",
+    "NextJS",
+    "FastAPI"
+  ],
+  "author": "Fadly Tanjung",
+  "license": "ISC"
+}

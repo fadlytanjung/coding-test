@@ -1,2 +1,5 @@
 fastapi
 uvicorn
+dotenv
+openai
+google-genai
