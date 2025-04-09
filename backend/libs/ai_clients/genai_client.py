@@ -1,17 +1,14 @@
-import os
-from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from typing import AsyncGenerator
 from anyio.to_thread import run_sync
 from anyio import create_task_group, create_memory_object_stream
+from app.core.config import AI_API_KEY
 from .base import BaseAIClient
-
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../.env"))
 
 class GeminiClient(BaseAIClient):
     def __init__(self):
-        self.client = genai.Client(api_key=os.getenv("AI_API_KEY"))
+        self.client = genai.Client(api_key=AI_API_KEY)
 
     async def stream_response(self, user_question: str) -> AsyncGenerator[str, None]:
         send_channel, receive_channel = create_memory_object_stream[str](max_buffer_size=10)
@@ -41,4 +38,3 @@ class GeminiClient(BaseAIClient):
                 tg.start_soon(run_sync, run_blocking)
                 async for chunk in receive_channel:
                     yield chunk
-                    

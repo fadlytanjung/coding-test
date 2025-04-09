@@ -1,13 +1,12 @@
 from openai import AsyncOpenAI
-from dotenv import load_dotenv
+from app.core.config import AI_API_KEY
 import os
 from .base import BaseAIClient
 
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../.env"))
 
 class OpenAIClient(BaseAIClient):
     def __init__(self):
-        self.client = AsyncOpenAI(api_key=os.getenv("AI_API_KEY"))
+        self.client = AsyncOpenAI(api_key=AI_API_KEY)
 
     async def stream_response(self, user_question: str):
         response = await self.client.chat.completions.create(
