@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Pagination as PaginationBase, Box } from '@mantine/core';
+import { Pagination as PaginationBase, Box } from "@mantine/core";
 
 interface Props {
   page: number;
@@ -9,10 +9,14 @@ interface Props {
 }
 
 export default function Pagination({ page, total, onChange }: Props) {
-  if (total <= 1) return null;
   return (
     <Box mt="md">
-      <PaginationBase value={page} onChange={onChange} total={total} size="sm" />
+      <PaginationBase
+        value={page}
+        onChange={onChange}
+        total={total}
+        size="sm"
+      />
     </Box>
   );
 }

@@ -1,121 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@mantine/core";
-import type { User } from "@/types/user";
-import MarkdownRenderer from "@/components/molecules/markdown-renderer";
-import env from "@/libs/env";
+import DataTable from "@/components/molecules/datatable";
+import { TableTd } from "@mantine/core";
 
-export default function HomePage() {
-  const [users, setUsers] = useState<{ salesReps: User[] }>({ salesReps: [] });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [question, setQuestion] = useState<string>("");
-  const [answer, setAnswer] = useState<string>("");
-  const [isAsking, setIsAsking] = useState<boolean>(false);
+const mockData = Array.from({ length: 10 }, (_, i) => ({
+  id: i + 1,
+  name: `User ${i + 1}`,
+  email: `user${i + 1}@mail.com`,
+  role: i % 2 === 0 ? "Admin" : "User",
+}));
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${env.NEXT_PUBLIC_BASE_API_URL}/sales-reps`);
-        const data = await res.json();
-        setUsers(data || []);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleAskQuestion = async () => {
-    setIsAsking(true);
-    setAnswer("");
-
-    try {
-      const response = await fetch(`${env.NEXT_PUBLIC_BASE_API_URL}/ai`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
-      });
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          setAnswer((prev) => prev + chunk);
-        }
-      }
-    } catch (err) {
-      console.error("Error reading stream:", err);
-    } finally {
-      setIsAsking(false);
-    }
-  };
-
+export default function Home() {
   return (
-    <main className="p-6 max-w-2xl mx-auto space-y-10">
-      <header>
-        <h1 className="text-4xl font-bold text-center text-blue-700">
-          AI Chat + FastAPI 🔥
-        </h1>
-        <p className="text-center text-gray-500">
-          Next.js, Tailwind, Gemini AI
-        </p>
-      </header>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Dummy User Data</h2>
-        <div className="bg-white p-4 rounded shadow">
-          {loading ? (
-            <p className="text-sm text-gray-400">Loading...</p>
-          ) : (
-            <ul className="list-disc pl-5 space-y-1">
-              {(users.salesReps || []).map((user) => (
-                <li key={user.id} className="text-sm text-gray-700">
-                  <span className="font-medium text-blue-600">{user.name}</span>{" "}
-                  - {user.role}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Chat with AI</h2>
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            className="input"
-            placeholder="Ask me anything..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAskQuestion()}
-          />
-          <Button
-            onClick={handleAskQuestion}
-            // disabled={!question || isAsking}
-            className="btn"
-          >
-            {isAsking ? "Asking..." : "Ask"}
-          </Button>
-        </div>
-
-        {answer && (
-          <div className="mt-6 bg-gray-100 p-4 rounded-lg shadow text-gray-800 whitespace-pre-wrap">
-            <strong className="block mb-2 text-blue-600">AI Response:</strong>
-            <MarkdownRenderer content={answer} />
-            {isAsking && <span className="animate-pulse text-gray-400">▍</span>}
-          </div>
-        )}
-      </section>
-    </main>
+    <DataTable
+      columns={["#", "Name", "Email", "Role"]}
+      data={mockData}
+      meta={{
+        total_data: 2,
+        total_page: 2,
+        total_data_on_page: 2,
+        page: 1,
+        size: 10,
+      }}
+      renderRow={(row) => (
+        <>
+          <TableTd>{row.id}</TableTd>
+          <TableTd>{row.name}</TableTd>
+          <TableTd>{row.email}</TableTd>
+          <TableTd>{row.role}</TableTd>
+        </>
+      )}
+    />
   );
 }

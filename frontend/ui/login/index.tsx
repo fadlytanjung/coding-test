@@ -14,12 +14,15 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, LoginValues } from "./schema";
 import { loginAction } from "./actions";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const expired = searchParams.get("expired");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { control, handleSubmit } = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),
@@ -29,6 +32,20 @@ export default function LoginForm() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (expired) {
+      showNotification({
+        title: "Token Expired",
+        message: "Please login again!",
+        color: "red",
+      });
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("expired");
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+  }, [expired]);
 
   const onSubmit = async (data: LoginValues) => {
     setIsSubmitting(true);

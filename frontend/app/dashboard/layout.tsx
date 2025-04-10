@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { logoutAction } from "@/ui/login/actions";
+import { useMediaQuery } from "@mantine/hooks";
 
 const menu = [
   { label: "Dashboard", icon: IconLayoutDashboard, href: "/dashboard" },
@@ -35,12 +36,18 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const toggleNavbar = () => {
+    setCollapsed((prev) => !prev);
+  };
+
   return (
     <AppShell
       navbar={{
         width: collapsed ? 73 : 200,
         breakpoint: "sm",
-        collapsed: { mobile: false },
+        collapsed: { mobile: !collapsed },
       }}
       padding="md"
       header={{ height: 60 }}
@@ -49,10 +56,7 @@ export default function DashboardLayout({
       <AppShell.Header withBorder={true} px={24} py="md">
         <Group justify="space-between">
           <Group>
-            <ActionIcon
-              variant="subtle"
-              onClick={() => setCollapsed(!collapsed)}
-            >
+            <ActionIcon variant="subtle" onClick={toggleNavbar}>
               <IconMenu2 />
             </ActionIcon>
             <Text fw={700}>InterOpera Dashboard</Text>
@@ -60,7 +64,13 @@ export default function DashboardLayout({
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar py="lg" px="sm" withBorder h="calc(100vh - 60px)">
+      <AppShell.Navbar
+        py="lg"
+        px="sm"
+        withBorder
+        h="calc(100vh - 60px)"
+        {...(isMobile && { w: 200 })}
+      >
         <Box
           style={{ height: "100%", display: "flex", flexDirection: "column" }}
         >
@@ -86,7 +96,9 @@ export default function DashboardLayout({
                       bg: "var(--mantine-color-blue-light-hover, var(--mantine-primary-color-filled-hover))",
                     })}
                     className={`${
-                      !collapsed ? "items-center gap-2" : "justify-center"
+                      !collapsed || (isMobile && collapsed)
+                        ? "items-center gap-2"
+                        : "justify-center"
                     } flex rounded-md px-2 py-2 transition-colors`}
                   >
                     <Tooltip
@@ -103,7 +115,8 @@ export default function DashboardLayout({
                         }
                       />
                     </Tooltip>
-                    {!collapsed && (
+
+                    {(!collapsed || (isMobile && collapsed)) && (
                       <Text
                         size="sm"
                         c={
@@ -113,6 +126,7 @@ export default function DashboardLayout({
                         }
                         style={{
                           fontWeight: 600,
+                          fontSize: 14,
                         }}
                       >
                         {label}
@@ -126,7 +140,7 @@ export default function DashboardLayout({
 
           <Box mt="md" pt="md">
             <Group
-              justify={collapsed ? "center" : "flex-start"}
+              justify={(!collapsed || (isMobile && collapsed)) ? "flex-start" : "center"}
               onClick={async () => {
                 await logoutAction();
                 router.push("/login");
@@ -138,7 +152,7 @@ export default function DashboardLayout({
                   <IconLogout size={16} />
                 </ActionIcon>
               </Tooltip>
-              {!collapsed && <Text size="sm">Logout</Text>}
+              {(!collapsed || (isMobile && collapsed)) && <Text size="sm">Logout</Text>}
             </Group>
           </Box>
         </Box>
@@ -158,8 +172,8 @@ export default function DashboardLayout({
       </AppShell.Footer>
 
       <AppShell.Main>
-        <ScrollArea w="100%" offsetScrollbars>
-          <Box mih="calc(100vh - 160px)">{children}</Box>
+        <ScrollArea w="100%" h="calc(100vh - 100px)" offsetScrollbars>
+          <Box>{children}</Box>
         </ScrollArea>
       </AppShell.Main>
     </AppShell>

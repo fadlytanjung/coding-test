@@ -15,7 +15,6 @@ export default function Search({ value, onChange }: Props) {
       onChange={(e) => onChange(e.currentTarget.value)}
       placeholder="Search..."
       leftSection={<IconSearch size={14} />}
-      size="xs"
       w={220}
     />
   );

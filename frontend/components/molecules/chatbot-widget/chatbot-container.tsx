@@ -1,5 +1,6 @@
 import { Paper, rem } from "@mantine/core";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import ChatBotMessages from "./chatbot-message";
 import ChatBotInput from "./chatbot-input";
 import ChatBotHeader from "./chatbot-header";
@@ -7,6 +8,7 @@ import env from "@/libs/env";
 
 export default function ChatBotContainer({ onClose }: { onClose: () => void }) {
   const [fullscreen, setFullscreen] = useState(false);
+  const pathname = usePathname();
   const [messages, setMessages] = useState<
     { question: string; answer: string }[]
   >([]);
@@ -49,6 +51,10 @@ export default function ChatBotContainer({ onClose }: { onClose: () => void }) {
     }
   };
 
+  const fullscreenWidth = pathname.startsWith("/dashboard")
+    ? "calc(100vw - 16px)"
+    : "100vw";
+
   return (
     <Paper
       shadow="xl"
@@ -59,7 +65,7 @@ export default function ChatBotContainer({ onClose }: { onClose: () => void }) {
         position: "fixed",
         bottom: fullscreen ? 0 : rem(24),
         right: fullscreen ? 0 : rem(24),
-        width: fullscreen ? "100vw" : rem(380),
+        width: fullscreen ? fullscreenWidth : rem(380),
         height: fullscreen ? "100vh" : rem(500),
         zIndex: 9999,
         display: "flex",
