@@ -8,6 +8,7 @@ from app.features.auth.repository import get_user_by_username
 from app.utils.security import verify_password
 from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, BASIC_AUTH_TOKEN
 from app.features.auth.schemas import Token, LoginBody
+from app.utils.response import create_response
 
 router = APIRouter()
 
@@ -18,16 +19,15 @@ def login(
     db: Session = Depends(get_db),
 ):
     if not authorization.startswith("Basic "):
-        raise HTTPException(status_code=401, detail="Invalid auth scheme")
+        return create_response(message="Invalid auth scheme", status="failed", code=401)
 
     encoded_token = authorization.replace("Basic ", "")
     if encoded_token != BASIC_AUTH_TOKEN:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        return create_response(message="Invalid credentials", status="failed", code=401)
 
     user = get_user_by_username(db, login_data.username)
     if not user or not verify_password(login_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-
+        return create_response(message="Invalid username or password", status="failed", code=401)
     access_token = jwt.encode(
         {
             "sub": user.username,

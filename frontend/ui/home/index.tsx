@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import MarkdownRenderer from "@/components/molecules/markdown-renderer";
+import { Button } from "@mantine/core";
 import type { User } from "@/types/user";
+import MarkdownRenderer from "@/components/molecules/markdown-renderer";
 import env from "@/libs/env";
 
 export default function HomePage() {
@@ -92,19 +93,19 @@ export default function HomePage() {
         <div className="flex gap-2 items-center">
           <input
             type="text"
-            className="border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="input"
             placeholder="Ask me anything..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAskQuestion()}
           />
-          <button
+          <Button
             onClick={handleAskQuestion}
-            disabled={!question || isAsking}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            // disabled={!question || isAsking}
+            className="btn"
           >
             {isAsking ? "Asking..." : "Ask"}
-          </button>
+          </Button>
         </div>
 
         {answer && (
