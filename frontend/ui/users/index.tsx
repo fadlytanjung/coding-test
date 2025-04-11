@@ -1,6 +1,14 @@
 "use client";
 
-import { ActionIcon, Button, Flex, Modal, TableTd, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Flex,
+  Modal,
+  ScrollArea,
+  TableTd,
+  Text,
+} from "@mantine/core";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
@@ -86,56 +94,60 @@ export default function User({
         </Text>
         <Breadcrumb items={items} />
       </div>
-      <DataTable
-        columns={[
-          "No",
-          "Username",
-          "Fullname",
-          "Role",
-          ...(isSysadmin ? ["Action"] : []),
-        ]}
-        data={data}
-        meta={meta}
-        {...(isSysadmin && {
-          headerRightSection: (
-            <Button
-              variant="light"
-              onClick={() => toAdd()}
-              leftSection={<IconPlus size={14} />}
-            >
-              Add User
-            </Button>
-          ),
-        })}
-        renderRow={(row, i) => (
-          <>
-            <TableTd>{meta.size * (meta.page - 1) + (i as number) + 1}</TableTd>
-            <TableTd>{row.username}</TableTd>
-            <TableTd>{row.fullname}</TableTd>
-            <TableTd>{row.role}</TableTd>
-            {isSysadmin && (
+      <ScrollArea w="100%" offsetScrollbars>
+        <DataTable
+          columns={[
+            "No",
+            "Username",
+            "Fullname",
+            "Role",
+            ...(isSysadmin ? ["Action"] : []),
+          ]}
+          data={data}
+          meta={meta}
+          {...(isSysadmin && {
+            headerRightSection: (
+              <Button
+                variant="light"
+                onClick={() => toAdd()}
+                leftSection={<IconPlus size={14} />}
+              >
+                Add User
+              </Button>
+            ),
+          })}
+          renderRow={(row, i) => (
+            <>
               <TableTd>
-                <Flex gap="sm">
-                  <Link href={`/dashboard/users/edit/${row.id}`}>
-                    <ActionIcon color="blue" variant="light">
-                      <IconEdit size={16} />
-                    </ActionIcon>
-                  </Link>
-                  {role != row.role && !!role && (
-                    <ActionIcon
-                      color="red"
-                      variant="light"
-                      onClick={() => handleOpenDelete(row.id)}
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  )}
-                </Flex>
+                {meta.size * (meta.page - 1) + (i as number) + 1}
               </TableTd>
-            )}
-          </>
-        )}
-      />
+              <TableTd>{row.username}</TableTd>
+              <TableTd>{row.fullname}</TableTd>
+              <TableTd>{row.role}</TableTd>
+              {isSysadmin && (
+                <TableTd>
+                  <Flex gap="sm">
+                    <Link href={`/dashboard/users/edit/${row.id}`}>
+                      <ActionIcon color="blue" variant="light">
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                    </Link>
+                    {role != row.role && !!role && (
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => handleOpenDelete(row.id)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    )}
+                  </Flex>
+                </TableTd>
+              )}
+            </>
+          )}
+        />
+      </ScrollArea>
       <Modal
         opened={opened}
         onClose={close}

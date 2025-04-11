@@ -108,15 +108,3 @@ Content-Type: application/json
 ```
 
 ---
-
-Let me know if you'd like a prewritten Dockerfile and test boilerplate next!
-```
-
----
-
-Would you like me to also generate:
-- ✅ A `Dockerfile` + `.dockerignore`
-- ✅ Unit test templates using `pytest`
-- ✅ VS Code devcontainer / launch settings?
-
-Just say the word, and I'll prep it all.

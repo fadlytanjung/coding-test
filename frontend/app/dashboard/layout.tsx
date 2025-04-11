@@ -90,7 +90,12 @@ export default function DashboardLayout({
                 return (
                   <UnstyledButton
                     key={label}
-                    onClick={() => router.push(href)}
+                    onClick={() => {
+                      router.push(href);
+                      if (isMobile) {
+                        toggleNavbar();
+                      }
+                    }}
                     p="sm"
                     {...(isActive && {
                       bg: "var(--mantine-color-blue-light-hover, var(--mantine-primary-color-filled-hover))",
@@ -140,7 +145,9 @@ export default function DashboardLayout({
 
           <Box mt="md" pt="md">
             <Group
-              justify={(!collapsed || (isMobile && collapsed)) ? "flex-start" : "center"}
+              justify={
+                !collapsed || (isMobile && collapsed) ? "flex-start" : "center"
+              }
               onClick={async () => {
                 await logoutAction();
                 router.push("/login");
@@ -152,7 +159,9 @@ export default function DashboardLayout({
                   <IconLogout size={16} />
                 </ActionIcon>
               </Tooltip>
-              {(!collapsed || (isMobile && collapsed)) && <Text size="sm">Logout</Text>}
+              {(!collapsed || (isMobile && collapsed)) && (
+                <Text size="sm">Logout</Text>
+              )}
             </Group>
           </Box>
         </Box>
@@ -172,9 +181,7 @@ export default function DashboardLayout({
       </AppShell.Footer>
 
       <AppShell.Main>
-        <ScrollArea w="100%" h="calc(100vh - 100px)" offsetScrollbars>
-          <Box>{children}</Box>
-        </ScrollArea>
+        <div>{children}</div>
       </AppShell.Main>
     </AppShell>
   );

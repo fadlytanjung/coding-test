@@ -3,12 +3,14 @@ import { SalesRep } from "@/types/sales";
 export const dealsPerClient = (salesReps: SalesRep[]) => {
   const clientDeals: Record<string, number> = {};
   salesReps.forEach((rep) => {
-    rep.deals.forEach((deal) => {
-      if (!clientDeals[deal.client]) {
-        clientDeals[deal.client] = 0;
-      }
-      clientDeals[deal.client] += deal.value;
-    });
+    rep.deals
+      .filter((el) => el.status === "Closed Won")
+      .forEach((deal) => {
+        if (!clientDeals[deal.client]) {
+          clientDeals[deal.client] = 0;
+        }
+        clientDeals[deal.client] += deal.value;
+      });
   });
   return clientDeals;
 };
@@ -19,16 +21,20 @@ export const dealsByRegion = (salesReps: SalesRep[]) => {
     if (!regionDeals[rep.region]) {
       regionDeals[rep.region] = 0;
     }
-    rep.deals.forEach((deal) => {
-      regionDeals[rep.region] += deal.value;
-    });
+    rep.deals
+      .filter((el) => el.status === "Closed Won")
+      .forEach((deal) => {
+        regionDeals[rep.region] += deal.value;
+      });
   });
   return regionDeals;
 };
 
 export const totalDealsPerRep = (salesReps: SalesRep[]) => {
   return salesReps.map((rep) => {
-    const totalValue = rep.deals.reduce((total, deal) => total + deal.value, 0);
+    const totalValue = rep.deals
+      .filter((el) => el.status === "Closed Won")
+      .reduce((total, deal) => total + deal.value, 0);
     return { name: rep.name, totalValue };
   });
 };
@@ -46,7 +52,10 @@ export const dealsByStatus = (salesReps: SalesRep[]) => {
 export const totalDeals = (salesReps: SalesRep[]) => {
   return salesReps.reduce((total, rep) => {
     return (
-      total + rep.deals.reduce((repTotal, deal) => repTotal + deal.value, 0)
+      total +
+      rep.deals
+        .filter((el) => el.status === "Closed Won")
+        .reduce((repTotal, deal) => repTotal + deal.value, 0)
     );
   }, 0);
 };

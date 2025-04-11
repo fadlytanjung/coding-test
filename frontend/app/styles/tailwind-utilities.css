@@ -5,3 +5,7 @@
 .input {
   @apply border border-gray-300 rounded-lg px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
+
+.dashboard-widget {
+  @apply w-full lg:w-[calc(calc(100%_-_48px)_/_4)];
+}
