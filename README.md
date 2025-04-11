@@ -75,7 +75,7 @@ This will:
 To run the backend individually, use:
 
 ```bash
-uvicorn backend.app.main:app --reload
+uvicorn app.main:app --reload
 ```
 
 
