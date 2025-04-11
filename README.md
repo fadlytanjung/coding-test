@@ -87,6 +87,16 @@ To run the frontend individually, use:
 npm run dev
 ```
 
+## API Documentation
+
+Once the backend server is running, you can access the API documentation at:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
 ## Contact
 
 Feel free to reach out if you have any questions or need assistance.
