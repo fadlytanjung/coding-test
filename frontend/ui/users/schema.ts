@@ -13,3 +13,31 @@ export const AddUserSchema = z
   });
 
 export type AddUserValues = z.infer<typeof AddUserSchema>;
+
+export const UpdateUserSchema = z
+  .object({
+    username: z.string(),
+    fullname: z.string().min(1, "Fullname is required"),
+    current_password: z.string().optional(),
+    new_password: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const { current_password, new_password } = data;
+    if (current_password && !new_password) {
+      ctx.addIssue({
+        path: ["new_password"],
+        message: "Both current and new password are required if one is provided",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    if (!current_password && new_password) {
+      ctx.addIssue({
+        path: ["current_password"],
+        message: "Both current and new password are required if one is provided",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  });
+
+export type UpdateUserValues = z.infer<typeof UpdateUserSchema>;

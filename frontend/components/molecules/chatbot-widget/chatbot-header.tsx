@@ -12,7 +12,7 @@ export default function ChatBotHeader({
 }) {
   return (
     <Group justify="space-between" px="sm" py="xs">
-      <strong>Chatbot (Gemini AI Model)</strong>
+      <strong className="text-sm">Chatbot (Gemini AI Model)</strong>
       <Group gap={4}>
         <ActionIcon variant="subtle" onClick={onToggleFullscreen}>
           {fullscreen ? <IconMinimize size={16} /> : <IconMaximize size={16} />}

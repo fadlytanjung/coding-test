@@ -33,7 +33,7 @@ export default function ChatBotMessages({
                 style={{
                   borderRadius: 16,
                   width: fullscreen ? "100%" : 320,
-                  fontSize: 14,
+                  fontSize: 12,
                 }}
               >
                 <MarkdownRenderer content={el.answer} />

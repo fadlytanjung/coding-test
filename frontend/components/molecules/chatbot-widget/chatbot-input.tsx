@@ -20,7 +20,7 @@ export default function ChatBotInput({
     <Box pt="xs">
       <Textarea
         placeholder={loading ? "Generating response..." : "Type your message..."}
-        minRows={1}
+        minRows={4}
         maxRows={6}
         value={value}
         disabled={loading}
@@ -28,8 +28,9 @@ export default function ChatBotInput({
         onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSubmit()}
         styles={{
           input: {
-            maxHeight: rem(180),
             overflowY: "auto",
+            height: 80,
+            fontSize: 12,
           },
         }}
       />

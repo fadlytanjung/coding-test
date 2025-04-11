@@ -1,6 +1,6 @@
 "use server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { AddUserValues } from "./schema";
+import { AddUserValues, UpdateUserValues } from "./schema";
 import { apiServerFetch } from "@/libs/api-server";
 
 export async function createUserAction(data: Partial<AddUserValues>) {
@@ -26,4 +26,17 @@ export async function deleteUserAction(id: number) {
   }
 
   return res;
+}
+
+
+export async function updateUserAction(data: Partial<UpdateUserValues>, id: string) {
+  const json = await apiServerFetch(`/v1/users/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return json;
 }

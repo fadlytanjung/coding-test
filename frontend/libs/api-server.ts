@@ -12,6 +12,7 @@ export async function apiServerFetch<T = any>(
   message: string;
   data?: T;
   meta?: MetaType
+  salesReps?: T;
 }> {
   const cookieStore = await cookies();
   const token = cookieStore.get("access_token")?.value;

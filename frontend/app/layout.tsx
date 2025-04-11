@@ -43,9 +43,9 @@ export default function RootLayout({
       <body className={`antialiased`}>
         <MantineProvider
           theme={{
-            fontFamily: "var(--font-geist-sans)",
+            fontFamily: "var(--font-geist-mono)",
             fontFamilyMonospace: "var(--font-geist-mono)",
-            headings: { fontFamily: "var(--font-geist-sans)" },
+            headings: { fontFamily: "var(--font-geist-mono)" },
           }}
         >
           <Notifications position="top-center" />

@@ -2,15 +2,19 @@
 
 import { TextInput, PasswordInput, Button, Stack } from "@mantine/core";
 import { Controller, useForm } from "react-hook-form";
-import { AddUserSchema, AddUserValues } from "./schema";
+import { AddUserValues, UpdateUserSchema, UpdateUserValues } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { showNotification } from "@mantine/notifications";
-import { createUserAction } from "./actions";
+import { updateUserAction } from "./actions";
 import { useRouter } from "next/navigation";
 import { useAuthUser } from "@/hooks/use-auth-user";
 
-export default function AddUserForm() {
+export default function UpdateUserForm({
+  data,
+}: {
+  data: AddUserValues & { id: string };
+}) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,31 +22,47 @@ export default function AddUserForm() {
   const role = user?.role;
   const isSysadmin = role === "sysadmin";
 
-  const { control, handleSubmit } = useForm<AddUserValues>({
-    resolver: zodResolver(AddUserSchema),
+  const {
+    control,
+    handleSubmit,
+    formState: { isDirty },
+  } = useForm<UpdateUserValues>({
+    resolver: zodResolver(UpdateUserSchema),
+    mode: "all",
     defaultValues: {
-      username: "",
-      fullname: "",
-      password: "",
-      confirmPassword: "",
+      username: data.username || "",
+      fullname: data.fullname || "",
+      current_password: "",
+      new_password: "",
     },
   });
 
-  const onSubmit = async (values: AddUserValues) => {
+  const onSubmit = async (values: UpdateUserValues) => {
     setIsSubmitting(true);
 
-    const res = await createUserAction(values);
-
+    const { username, ...payload } = values;
+    const newPayload = {
+      ...(data.fullname != values.fullname && {
+        fullname: values.fullname,
+      }),
+      ...(payload.current_password && {
+        current_password: payload.current_password,
+      }),
+      ...(payload.new_password && {
+        new_password: payload.new_password,
+      }),
+    };
+    const res = await updateUserAction(newPayload, data.id);
     if (res.status === "success") {
       showNotification({
         title: "Success",
-        message: "User created successfully!",
+        message: "User updated successfully!",
         color: "green",
       });
-      router.push("/dashboard/users");
+      router.back();
     } else {
       showNotification({
-        title: "Add User Failed",
+        title: "Update Failed",
         message: res.message || "Something went wrong",
         color: "red",
       });
@@ -60,12 +80,9 @@ export default function AddUserForm() {
             render={({ field, fieldState: { error } }) => (
               <TextInput
                 {...field}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
-                  field.onChange(value);
-                }}
                 label="Username"
                 placeholder="Enter username"
+                disabled
                 withAsterisk
                 error={error?.message}
               />
@@ -84,34 +101,40 @@ export default function AddUserForm() {
               />
             )}
           />
+
           <Controller
-            name="password"
+            name="current_password"
             control={control}
             render={({ field, fieldState: { error } }) => (
               <PasswordInput
                 {...field}
-                label="Password"
-                placeholder="Enter password"
-                withAsterisk
+                label="Current Password"
+                placeholder="Enter current password"
                 error={error?.message}
               />
             )}
           />
+
           <Controller
-            name="confirmPassword"
+            name="new_password"
             control={control}
             render={({ field, fieldState: { error } }) => (
               <PasswordInput
                 {...field}
-                label="Confirm Password"
-                placeholder="Re-enter password"
-                withAsterisk
+                label="New Password"
+                placeholder="Enter new password"
                 error={error?.message}
               />
             )}
           />
+
           {isSysadmin && (
-            <Button type="submit" fullWidth loading={isSubmitting}>
+            <Button
+              type="submit"
+              fullWidth
+              loading={isSubmitting}
+              disabled={!isDirty}
+            >
               Submit
             </Button>
           )}

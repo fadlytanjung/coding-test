@@ -11,6 +11,7 @@ import { showNotification } from "@mantine/notifications";
 import { deleteUserAction } from "./actions";
 import DataTable from "@/components/molecules/datatable";
 import Breadcrumb from "@/components/atoms/breadcrums";
+import Link from "next/link";
 
 type UserType = {
   id: number;
@@ -115,9 +116,11 @@ export default function User({
             {isSysadmin && (
               <TableTd>
                 <Flex gap="sm">
-                  <ActionIcon color="blue" variant="light">
-                    <IconEdit size={16} />
-                  </ActionIcon>
+                  <Link href={`/dashboard/users/edit/${row.id}`}>
+                    <ActionIcon color="blue" variant="light">
+                      <IconEdit size={16} />
+                    </ActionIcon>
+                  </Link>
                   {role != row.role && !!role && (
                     <ActionIcon
                       color="red"
